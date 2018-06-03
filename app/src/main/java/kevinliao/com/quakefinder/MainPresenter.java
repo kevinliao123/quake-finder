@@ -2,6 +2,7 @@ package kevinliao.com.quakefinder;
 
 import android.util.Log;
 
+import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -53,24 +54,27 @@ public class MainPresenter implements MainContract.Presenter {
     @Override
     public void loadEvent(String startDate) {
         mView.showProgressbar();
-        mNetworkClient.getEarthquakeByTime(startDate, new DownloadCallback<List<Earthquake>>() {
-            @Override
-            public void onSuccess(List<Earthquake> result) {
-                mEventList.addAll(new ArrayList<>(result));
-                mDatabaseHelper.addEvents(result);
-                Collections.sort(mEventList, mComparator);
-                mView.showEvent(mEventList);
-                mView.hideProgressbar();
-            }
+        CurrentEventCallback callback = new CurrentEventCallback(this);
+        mNetworkClient.getEarthquakeByTime(startDate, callback);
+    }
 
-            @Override
-            public void onFailure(Exception e) {
-                Log.i(TAG, "onFailure: " + e.getMessage());
-                mView.hideProgressbar();
-                mView.showNetworkErrorMessage();
-                mIsLoading = false;
-            }
-        });
+    private void createEventList(List<Earthquake> list) {
+        mEventList.addAll(new ArrayList<>(list));
+        mDatabaseHelper.addEvents(list);
+        Collections.sort(mEventList, mComparator);
+        mView.showEvent(mEventList);
+        mView.hideProgressbar();
+    }
+
+    private void showErrorMessage(Exception e) {
+        Log.i(TAG, "onFailure: " + e.getMessage());
+        mView.hideProgressbar();
+        mView.showNetworkErrorMessage();
+        mIsLoading = false;
+    }
+
+    private void addEventsToDatabase(List<Earthquake> list) {
+        mDatabaseHelper.addEvents(list);
     }
 
     @Override
@@ -94,22 +98,8 @@ public class MainPresenter implements MainContract.Presenter {
         mIsLoading = true;
         String startDate = convertTimestampToDate(start, 0);
         String endDate = convertTimestampToDate(end, 0);
-        mNetworkClient.getEarthquakeByTime(startDate, endDate, new DownloadCallback<List<Earthquake>>() {
-            @Override
-            public void onSuccess(List<Earthquake> result) {
-                mDatabaseHelper.addEvents(result);
-                updateCurrentList(result);
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                Log.i(TAG, "onFailure: " + e.getMessage());
-                mView.hideProgressbar();
-                mView.showNetworkErrorMessage();
-                mIsLoading = false;
-
-            }
-        });
+        PastEventCallback callback = new PastEventCallback(this);
+        mNetworkClient.getEarthquakeByTime(startDate, endDate, callback);
     }
 
     private void updateCurrentList(List<Earthquake> newList) {
@@ -125,6 +115,46 @@ public class MainPresenter implements MainContract.Presenter {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(mill - offset);
         return new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(cal.getTime());
+    }
+
+    private static class CurrentEventCallback implements DownloadCallback<List<Earthquake>> {
+        protected WeakReference<MainPresenter> presenterReference;
+
+        public CurrentEventCallback(MainPresenter presenter) {
+            presenterReference = new WeakReference<>(presenter);
+        }
+
+        @Override
+        public void onSuccess(List<Earthquake> result) {
+            MainPresenter presenter = presenterReference.get();
+            if (presenter != null) {
+                presenter.createEventList(result);
+            }
+        }
+
+        @Override
+        public void onFailure(Exception e) {
+            MainPresenter presenter = presenterReference.get();
+            if (presenter != null) {
+                presenter.showErrorMessage(e);
+            }
+        }
+    }
+
+    private static class PastEventCallback extends CurrentEventCallback {
+        public PastEventCallback(MainPresenter presenter) {
+            super(presenter);
+        }
+
+        @Override
+        public void onSuccess(List<Earthquake> result) {
+            MainPresenter presenter = presenterReference.get();
+            if (presenter != null) {
+                presenter.addEventsToDatabase(result);
+                presenter.updateCurrentList(result);
+            }
+        }
+
     }
 
 }
