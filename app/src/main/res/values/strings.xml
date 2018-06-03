@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">QuakeFinder</string>
+    <string name="preference_file_key">quake_finder_preference</string>
+
+    <!--key-->
+    <string name="earthquake_url_key">url_key</string>
 </resources>

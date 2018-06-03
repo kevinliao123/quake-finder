@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/list_item_height">
+
+    <TextView
+        android:id="@+id/place_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/general_margin"
+        android:layout_marginTop="@dimen/general_margin"
+        android:layout_toEndOf="@id/imageView"
+        android:text="TextView"
+        android:textSize="@dimen/text_size" />
+
+    <TextView
+        android:id="@+id/time_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@id/place_text"
+        android:layout_below="@id/place_text"
+        android:text="TextView"
+        android:textSize="@dimen/text_size" />
+
+    <TextView
+        android:id="@+id/latitude_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/place_text"
+        android:layout_below="@id/time_text"
+        android:text="TextView"
+        android:textSize="@dimen/text_size" />
+
+    <TextView
+        android:id="@+id/longitude_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/latitude_text"
+        android:layout_marginLeft="@dimen/general_margin_large"
+        android:layout_toEndOf="@id/latitude_text"
+        android:text="TextView"
+        android:textSize="@dimen/text_size" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="@dimen/icon_size"
+        android:layout_height="@dimen/icon_size"
+        android:layout_centerVertical="true"
+        android:layout_marginBottom="@dimen/general_margin"
+        android:layout_marginStart="@dimen/general_margin"
+        android:layout_marginTop="@dimen/general_margin"
+        app:srcCompat="@drawable/ic_alert" />
+</RelativeLayout>
