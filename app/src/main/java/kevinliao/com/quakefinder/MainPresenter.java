@@ -51,6 +51,7 @@ public class MainPresenter implements MainContract.Presenter {
     @Override
     public void loadEvent(String startDate) {
         if (mEventList != null && mEventList.size() != 0) return;
+        mView.hideNetworkErrorMessage();
         mView.showProgressbar();
         CurrentEventCallback callback = new CurrentEventCallback(this);
         mNetworkClient.getEarthquakeByTime(startDate, callback);
@@ -67,7 +68,7 @@ public class MainPresenter implements MainContract.Presenter {
     private void showErrorMessage(Exception e) {
         Log.i(TAG, "onFailure: " + e.getMessage());
         mView.hideProgressbar();
-        mView.showNetworkErrorMessage();
+        mView.showNetworkErrorToast();
         mIsLoading = false;
     }
 

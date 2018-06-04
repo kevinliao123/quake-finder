@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     MainContract.Presenter mPresenter;
     RecyclerView mRecyclerView;
     ProgressBar mProgressBar;
+    TextView mNetworkErrorMessage;
     EventAdapter mAdapter;
     Handler mHandler;
     NetworkChangeReceiver mReceiver;
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         mHandler = new Handler();
         mRecyclerView = findViewById(R.id.event_recycler_view);
         mProgressBar = findViewById(R.id.progress_bar);
+        mNetworkErrorMessage = findViewById(R.id.network_error);
         setupRecyclerView();
         mPresenter = new MainPresenter(Injection.provideEventDatabaseHelper(getApplicationContext())
                 , Injection.provideNetworkClient());
@@ -100,7 +103,12 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     }
 
     @Override
-    public void showNetworkErrorMessage() {
+    public void hideNetworkErrorMessage() {
+        mNetworkErrorMessage.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showNetworkErrorToast() {
         Toast.makeText(this, "Network issue at this time, try again later!", Toast.LENGTH_SHORT).show();
     }
 }

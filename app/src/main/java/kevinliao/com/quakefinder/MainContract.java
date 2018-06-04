@@ -13,7 +13,9 @@ public interface MainContract {
 
         void hideProgressbar();
 
-        void showNetworkErrorMessage();
+        void hideNetworkErrorMessage();
+
+        void showNetworkErrorToast();
     }
 
     interface Presenter {
