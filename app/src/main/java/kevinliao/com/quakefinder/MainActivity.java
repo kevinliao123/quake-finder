@@ -57,14 +57,10 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this,
                 DividerItemDecoration.VERTICAL));
         mAdapter = new EventAdapter();
-        EventAdapter.OnBottomReachedListener listener = new EventAdapter.OnBottomReachedListener() {
-            @Override
-            public void onBottomReached(long mill) {
-                long offset = TimeUnit.DAYS.toMillis(1);
-                if (mPresenter.loadEventFromDatabase(mill - offset, mill) == 0) {
-                    mPresenter.loadEventFromCloud(mill - offset, mill);
-                }
-
+        EventAdapter.OnBottomReachedListener listener = mill -> {
+            long offset = TimeUnit.DAYS.toMillis(1);
+            if (mPresenter.loadEventFromDatabase(mill - offset, mill) == 0) {
+                mPresenter.loadEventFromCloud(mill - offset, mill);
             }
         };
         mAdapter.setOnBottomReachedListener(listener);
@@ -86,33 +82,21 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     public void showEvent(final List<Earthquake> list) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mAdapter.setDataset(list);
-                mAdapter.notifyDataSetChanged();
-            }
+        mHandler.post(() -> {
+            mAdapter.setDataset(list);
+            mAdapter.notifyDataSetChanged();
         });
     }
 
     @Override
     public void showProgressbar() {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mProgressBar.setVisibility(View.VISIBLE);
-            }
-        });
+        mHandler.post(() -> mProgressBar.setVisibility(View.VISIBLE));
     }
+
 
     @Override
     public void hideProgressbar() {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mProgressBar.setVisibility(View.GONE);
-            }
-        });
+        mHandler.post(() -> mProgressBar.setVisibility(View.GONE));
     }
 
     @Override

@@ -17,11 +17,8 @@ import java.util.List;
 import kevinliao.com.quakefinder.network.Earthquake;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
-    List<Earthquake> mDataSet = new ArrayList<>();
-    OnBottomReachedListener onBottomReachedListener;
-
-    public EventAdapter() {
-    }
+    private List<Earthquake> mDataSet = new ArrayList<>();
+    private OnBottomReachedListener onBottomReachedListener;
 
     public void setDataset(List<Earthquake> dataset) {
         mDataSet = dataset;
@@ -63,7 +60,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         TextView place, time, latitude, longitude;
         String url;
 
-        public EventViewHolder(View itemView) {
+        EventViewHolder(View itemView) {
             super(itemView);
             place = itemView.findViewById(R.id.place_text);
             time = itemView.findViewById(R.id.time_text);
@@ -81,7 +78,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             v.setEnabled(true);
         }
 
-        public void bind(Earthquake event) {
+        void bind(Earthquake event) {
             url = event.getUrl();
             place.setText(event.getPlace());
             time.setText(getDate(event.getTimeStamp()));

@@ -25,14 +25,11 @@ public class MainPresenter implements MainContract.Presenter {
     private NetworkClient mNetworkClient;
     private List<Earthquake> mEventList = new ArrayList<>();
     private boolean mIsLoading;
-    Comparator<Earthquake> mComparator = new Comparator<Earthquake>() {
-        @Override
-        public int compare(Earthquake o1, Earthquake o2) {
-            long a = o1.getTimeStamp();
-            long b = o2.getTimeStamp();
-            if (a == b) return 0;
-            return b - a > 0 ? 1 : -1;
-        }
+    Comparator<Earthquake> mComparator = (o1, o2) -> {
+        long a = o1.getTimeStamp();
+        long b = o2.getTimeStamp();
+        if (a == b) return 0;
+        return b - a > 0 ? 1 : -1;
     };
 
     public MainPresenter(EventDatabaseHelper eventDatabaseHelper
