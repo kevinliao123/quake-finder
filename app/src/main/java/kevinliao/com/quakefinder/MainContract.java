@@ -16,6 +16,8 @@ public interface MainContract {
         void hideNetworkErrorMessage();
 
         void showNetworkErrorToast();
+
+        void showContentLimitMessage();
     }
 
     interface Presenter {
@@ -28,5 +30,7 @@ public interface MainContract {
         int loadEventFromDatabase(long start, long end);
 
         void loadEventFromCloud(long start, long end);
+
+        void cleanupOldRecords(long ts);
     }
 }

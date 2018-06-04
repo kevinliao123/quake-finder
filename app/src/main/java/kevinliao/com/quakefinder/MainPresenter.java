@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import kevinliao.com.quakefinder.data.EventDatabaseHelper;
 import kevinliao.com.quakefinder.network.DownloadCallback;
@@ -94,11 +95,22 @@ public class MainPresenter implements MainContract.Presenter {
     @Override
     public void loadEventFromCloud(long start, long end) {
         if (mIsLoading) return;
+        if(!isInRange(end)) {
+            mView.hideProgressbar();
+            mView.showContentLimitMessage();
+            return;
+        }
         mIsLoading = true;
         String startDate = convertTimestampToDate(start, 0);
         String endDate = convertTimestampToDate(end, 0);
         PastEventCallback callback = new PastEventCallback(this);
         mNetworkClient.getEarthquakeByTime(startDate, endDate, callback);
+    }
+
+    private boolean isInRange(long end) {
+        long offset = TimeUnit.DAYS.toMillis(30);
+        long limit = System.currentTimeMillis() - offset;
+        return end > limit;
     }
 
     private void updateCurrentList(List<Earthquake> newList) {
@@ -114,6 +126,11 @@ public class MainPresenter implements MainContract.Presenter {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(mill - offset);
         return new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(cal.getTime());
+    }
+
+    @Override
+    public void cleanupOldRecords(long ts) {
+        mDatabaseHelper.deleteEventsByTimestamp(ts);
     }
 
     private static class CurrentEventCallback implements DownloadCallback<List<Earthquake>> {

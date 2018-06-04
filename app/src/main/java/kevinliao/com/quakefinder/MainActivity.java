@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         setupRecyclerView();
         mPresenter = new MainPresenter(Injection.provideEventDatabaseHelper(getApplicationContext())
                 , Injection.provideNetworkClient());
+        long offset = TimeUnit.DAYS.toMillis(30);
+        mPresenter.cleanupOldRecords(System.currentTimeMillis() - offset);
         mPresenter.takeView(this);
         setupNetworkReceiver();
     }
@@ -110,5 +112,10 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     @Override
     public void showNetworkErrorToast() {
         Toast.makeText(this, "Network issue at this time, try again later!", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showContentLimitMessage() {
+        Toast.makeText(this, "Only show events up to 30 days", Toast.LENGTH_SHORT).show();
     }
 }
