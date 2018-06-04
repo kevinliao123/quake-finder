@@ -53,6 +53,7 @@ public class MainPresenter implements MainContract.Presenter {
 
     @Override
     public void loadEvent(String startDate) {
+        if (mEventList != null && mEventList.size() != 0) return;
         mView.showProgressbar();
         CurrentEventCallback callback = new CurrentEventCallback(this);
         mNetworkClient.getEarthquakeByTime(startDate, callback);

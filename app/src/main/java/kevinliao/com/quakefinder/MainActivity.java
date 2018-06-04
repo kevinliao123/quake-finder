@@ -1,5 +1,7 @@
 package kevinliao.com.quakefinder;
 
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     ProgressBar mProgressBar;
     EventAdapter mAdapter;
     Handler mHandler;
+    NetworkChangeReceiver mReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +42,13 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         mPresenter = new MainPresenter(Injection.provideEventDatabaseHelper(getApplicationContext())
                 , Injection.provideNetworkClient());
         mPresenter.takeView(this);
-        mPresenter.loadEvent(getCurrentDate());
+        setupNetworkReceiver();
+    }
+
+    private void setupNetworkReceiver() {
+        mReceiver = new NetworkChangeReceiver();
+        mReceiver.addOnNetworkChangeListener(() -> mPresenter.loadEvent(getCurrentDate()));
+        registerReceiver(mReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     private void setupRecyclerView() {
@@ -70,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(mReceiver);
         mPresenter.dropView();
         mPresenter = null;
     }
